@@ -15,7 +15,7 @@ FROM (
 	FROM ODLN T0
 	LEFT JOIN VW_McdStocker_Error T1 ON T1.DocEntry_OG = T0.DocEntry
 	LEFT JOIN OHEM T3 ON CONCAT(T3.firstName,' ' ,T3.lastName) = T1.U_SLD_McdStocker_OG
-WHERE T0.DocDate Between '[%0]' AND '[%1]'
+--WHERE T0.DocDate Between '[%0]' AND '[%1]'
 WHERE DocDate = '20240507'
 
 	GROUP BY T0.DocEntry,U_SLD_McdStocker_OG,T1.TYPE,T3.Code
