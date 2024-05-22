@@ -1,0 +1,26 @@
+----------------------------รายงาน KPI พนักงานตรวจสอบสินค้า (Checker)-------------------
+
+SELECT DocEntry,รหัสพนักงาน,ชื่อพนักงาน,SUM(จำนวนครั้งจัดตู้) AS N'ผลรวมการทำงานที่ตรวจสอบ(ครั้ง)',SUM(รวมน้ำหนักสินค้า)AS N'รวมน้ำหนักสินค้า',SUM(ERROR) AS 'ผลรวมการทำงานที่ผิดพลาด(ครั้ง)',SUM(น้ำหนักสินค้าERROR) AS N'รวมน้ำหนักสินค้า ERROR'
+FROM (
+	SELECT
+--ROW_NUMBER() OVER(ORDER BY T3.Code ASC) AS N'ลำดับ',
+	T0.DocEntry,
+	T3.Code AS N'รหัสพนักงาน',
+	U_SLD_McdStocker_OG AS N'ชื่อพนักงาน',
+	ISNULL(CASE WHEN T1.TYPE = 1 THEN SUM(ISNULL(T1.organizer,0)) END,0) AS N'จำนวนครั้งจัดตู้',
+	ISNULL(CASE WHEN T1.TYPE = 2 THEN SUM(ISNULL(T1.organizer,0)) END,0) AS 'Error',
+	SUM (T0.U_SLD_SumItemWeight) AS N'รวมน้ำหนักสินค้า',
+	SUM (T0.U_SLD_ItemWeightError) AS N'น้ำหนักสินค้าERROR'
+
+	FROM ODLN T0
+	LEFT JOIN VW_McdStocker_Error T1 ON T1.DocEntry_OG = T0.DocEntry
+	LEFT JOIN OHEM T3 ON CONCAT(T3.firstName,' ' ,T3.lastName) = T1.U_SLD_McdStocker_OG
+WHERE T0.DocDate Between '[%0]' AND '[%1]'
+WHERE DocDate = '20240507'
+
+	GROUP BY T0.DocEntry,U_SLD_McdStocker_OG,T1.TYPE,T3.Code
+
+	) AS ERROR
+	WHERE รหัสพนักงาน IS NOT NULL and DocEntry = '14665'
+	GROUP BY DocEntry,รหัสพนักงาน,ชื่อพนักงาน
+ORDER BY รหัสพนักงาน ASC
